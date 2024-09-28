@@ -1,8 +1,15 @@
 name: Autograde Solidity Assignment
-on: [push, pull_request]
+'on':
+- push
+- repository_dispatch
+permissions:
+  checks: write
+  actions: read
+  contents: read
 jobs:
   test:
     runs-on: ubuntu-latest
+    if: github.actor != 'github-classroom[bot]'
     steps:
     - name: Checkout code
       uses: actions/checkout@v2
@@ -19,10 +26,13 @@ jobs:
       uses: classroom-resources/autograding-command-grader@v1
       with:
         test-name: Autograding
+        setup-command: ''
         command: npx hardhat test
+        timeout: 10
+        max-score: 10
     - name: Autograding Reporter
       uses: classroom-resources/autograding-grading-reporter@v1
       env:
-        AUTOGRADE_RESULTS: "${{steps.autograding.outputs.result}}"
+        AUTOGRADING: "${{steps.autograding.outputs.result}}"
       with:
         runners: autograding
